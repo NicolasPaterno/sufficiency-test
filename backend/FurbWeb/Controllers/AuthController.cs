@@ -46,14 +46,12 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        // Verificar se o login já existe
         var usuarioExistente = await _usuarioDAO.GetByLoginAsync(request.Login);
         if (usuarioExistente != null)
         {
             return Conflict(new { message = "Login já existe" });
         }
 
-        // Criar novo usuário
         var usuario = new Usuario
         {
             Login = request.Login,
@@ -70,8 +68,6 @@ public class AuthController : ControllerBase
     [Microsoft.AspNetCore.Authorization.Authorize]
     public IActionResult Logout()
     {
-        // Como estamos usando JWT stateless, o logout é feito no cliente
-        // removendo o token. Este endpoint pode ser usado para logging.
         return Ok(new { message = "Logout realizado com sucesso" });
     }
 }
