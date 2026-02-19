@@ -1,0 +1,78 @@
+# Backend - .NET
+backend/**/bin/
+backend/**/obj/
+backend/**/.vs/
+backend/**/.vscode/
+backend/**/*.user
+backend/**/*.suo
+backend/**/*.userosscache
+backend/**/*.sln.docstates
+backend/**/*.userprefs
+backend/**/project.lock.json
+backend/**/project.fragment.lock.json
+backend/**/artifacts/
+backend/**/.idea/
+backend/**/.vs/
+backend/**/.vscode/
+backend/**/*.swp
+backend/**/*.swo
+backend/**/*~
+backend/**/.DS_Store
+
+# Backend - Configurações sensíveis (credenciais de banco, JWT keys, etc.)
+backend/**/appsettings.json
+backend/**/appsettings.*.json
+!backend/**/appsettings.Example.json
+
+# Backend - Migrations (opcional - descomente se não quiser versionar migrations)
+# backend/FurbWeb/Migrations/
+
+# Frontend - Node.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/.vercel
+frontend/.turbo
+frontend/.cache
+
+# Frontend - Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/lerna-debug.log*
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
