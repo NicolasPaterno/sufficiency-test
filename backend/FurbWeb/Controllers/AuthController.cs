@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
         };
 
         var usuarioCriado = await _usuarioDAO.CreateAsync(usuario);
-        usuarioCriado.Senha = string.Empty; // Não retornar senha
+        usuarioCriado.Senha = string.Empty;
 
         return CreatedAtAction(nameof(Register), new { id = usuarioCriado.Id }, usuarioCriado);
     }
