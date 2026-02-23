@@ -19,6 +19,8 @@ export default function ComandaDetalhesPage() {
   const [comanda, setComanda] = useState<Comanda | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
 
   useEffect(() => {
     if (!auth.isAuthenticated()) {
@@ -43,16 +45,25 @@ export default function ComandaDetalhesPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Tem certeza que deseja excluir esta comanda?')) {
-      return;
-    }
+  const handleExcluirClick = () => {
+    setConfirmandoExclusao(true);
+    setError('');
+  };
 
+  const handleCancelarExclusao = () => {
+    setConfirmandoExclusao(false);
+  };
+
+  const handleConfirmarExclusao = async () => {
     try {
+      setExcluindo(true);
       await comandasApi.delete(id);
       router.push('/comandas');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao excluir comanda');
+      setConfirmandoExclusao(false);
+    } finally {
+      setExcluindo(false);
     }
   };
 
@@ -159,17 +170,41 @@ export default function ComandaDetalhesPage() {
           </CardContent>
         </Card>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
           <Link href={`/comandas/${id}/editar`}>
             <Button variant="outline" size="sm" className="gap-1.5">
               <Pencil className="h-4 w-4" />
               Editar
             </Button>
           </Link>
-          <Button variant="destructive" size="sm" onClick={handleDelete} className="gap-1.5">
-            <Trash2 className="h-4 w-4" />
-            Excluir comanda
-          </Button>
+          {confirmandoExclusao ? (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground">Deseja excluir esta comanda?</span>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleConfirmarExclusao}
+                disabled={excluindo}
+                className="gap-1.5"
+              >
+                <Trash2 className="h-4 w-4" />
+                {excluindo ? 'Excluindo...' : 'Sim, excluir'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCancelarExclusao}
+                disabled={excluindo}
+              >
+                Não, cancelar
+              </Button>
+            </div>
+          ) : (
+            <Button variant="destructive" size="sm" onClick={handleExcluirClick} className="gap-1.5">
+              <Trash2 className="h-4 w-4" />
+              Excluir comanda
+            </Button>
+          )}
         </div>
       </main>
     </div>

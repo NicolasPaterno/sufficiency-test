@@ -9,14 +9,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Header } from '@/components/Header';
 import { comandasApi } from '@/lib/api';
 import { auth } from '@/lib/auth';
-import type { Cliente } from '@/types/comanda';
-import { LayoutDashboard, PlusCircle } from 'lucide-react';
+import type { ComandaResumo } from '@/types/comanda';
+import { Eye, LayoutDashboard, Pencil, PlusCircle, Trash2 } from 'lucide-react';
 
 export default function ComandasPage() {
   const router = useRouter();
-  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [comandas, setComandas] = useState<ComandaResumo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [confirmandoExclusaoId, setConfirmandoExclusaoId] = useState<number | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
 
   useEffect(() => {
     if (!auth.isAuthenticated()) {
@@ -30,11 +32,33 @@ export default function ComandasPage() {
     try {
       setLoading(true);
       const data = await comandasApi.getAll();
-      setClientes(data);
+      setComandas(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao carregar comandas');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExcluirClick = (idComanda: number) => {
+    setConfirmandoExclusaoId(idComanda);
+    setError('');
+  };
+
+  const handleCancelarExclusao = () => {
+    setConfirmandoExclusaoId(null);
+  };
+
+  const handleConfirmarExclusao = async (idComanda: number) => {
+    try {
+      setExcluindo(true);
+      await comandasApi.delete(idComanda);
+      setConfirmandoExclusaoId(null);
+      await loadComandas();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao excluir comanda');
+    } finally {
+      setExcluindo(false);
     }
   };
 
@@ -80,7 +104,7 @@ export default function ComandasPage() {
             <CardDescription>Clique em Ver comanda para abrir os detalhes</CardDescription>
           </CardHeader>
           <CardContent>
-            {clientes.length === 0 ? (
+            {comandas.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <p className="mb-4">Nenhuma comanda encontrada.</p>
                 <Link href="/comandas/nova">
@@ -98,17 +122,54 @@ export default function ComandasPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {clientes.map((cliente) => (
-                    <TableRow key={cliente.idCliente}>
-                      <TableCell className="font-medium">{cliente.idCliente}</TableCell>
-                      <TableCell>{cliente.nomeCliente}</TableCell>
-                      <TableCell>{cliente.telefoneCliente}</TableCell>
+                  {comandas.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.idCliente}</TableCell>
+                      <TableCell>{item.nomeCliente}</TableCell>
+                      <TableCell>{item.telefoneCliente}</TableCell>
                       <TableCell className="text-right">
-                        <Link href={`/comandas/${cliente.idCliente}`}>
-                          <Button variant="outline" size="sm">
-                            Ver comanda
+                        <Link href={`/comandas/${item.id}`}>
+                          <Button variant="outline" size="sm" className="gap-1.5">
+                            <Eye className="h-4 w-4" />
                           </Button>
                         </Link>
+                        <Link href={`/comandas/${item.id}/editar`}>
+                          <Button variant="outline" size="sm" className="gap-1.5 ml-1">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        {confirmandoExclusaoId === item.id ? (
+                          <span className="inline-flex items-center gap-2 ml-1">
+                            <span className="text-sm text-muted-foreground">Deseja excluir?</span>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="gap-1.5"
+                              onClick={() => handleConfirmarExclusao(item.id)}
+                              disabled={excluindo}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              {excluindo ? 'Excluindo...' : 'Sim'}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleCancelarExclusao}
+                              disabled={excluindo}
+                            >
+                              Não
+                            </Button>
+                          </span>
+                        ) : (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="gap-1.5 ml-1"
+                            onClick={() => handleExcluirClick(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
