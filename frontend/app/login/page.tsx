@@ -26,7 +26,11 @@ export default function LoginPage() {
       await authApi.login({ login, senha });
       router.push('/comandas');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao fazer login');
+      const mensagem =
+        err instanceof Error
+          ? err.message
+          : 'Erro ao fazer login. Verifique seus dados e tente novamente.';
+      setError(mensagem);
     } finally {
       setLoading(false);
     }

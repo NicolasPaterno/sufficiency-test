@@ -42,24 +42,40 @@ async function fetchWithAuth<T>(
   return response.json();
 }
 
+function getMensagemErroLogin(err: unknown): string {
+  if (err instanceof Error) {
+    const msg = err.message.toLowerCase();
+    if (msg.includes('failed to fetch') || msg.includes('network') || msg.includes('load'))
+      return 'Não foi possível conectar ao servidor. Verifique se o backend está rodando em http://localhost:8080';
+    return err.message;
+  }
+  return 'Erro ao fazer login. Tente novamente.';
+}
+
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Login ou senha inválidos' }));
-      throw new Error(error.message || 'Erro ao fazer login');
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ message: 'Login ou senha inválidos' }));
+        throw new Error(error.message || 'Login ou senha inválidos');
+      }
+
+      const data: LoginResponse = await response.json();
+      auth.setToken(data.access_token);
+      return data;
+    } catch (err) {
+      if (err instanceof Error && err.message !== 'Login ou senha inválidos')
+        throw new Error(getMensagemErroLogin(err));
+      throw err;
     }
-
-    const data: LoginResponse = await response.json();
-    auth.setToken(data.access_token);
-    return data;
   },
 
   register: async (credentials: RegisterRequest): Promise<void> => {
