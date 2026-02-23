@@ -13,3 +13,5 @@ public class CriarProdutoRequest
     public decimal Preco { get; set; }
 }
 
+
+

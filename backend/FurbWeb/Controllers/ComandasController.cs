@@ -23,7 +23,6 @@ public class ComandasController : ControllerBase
         try
         {
             var comandas = await _comandaService.GetAllComandasAsync();
-            // Retornar clientes únicos conforme especificação do enunciado
             var clientes = comandas
                 .GroupBy(c => c.IdCliente)
                 .Select(g => new ClienteDTO
@@ -47,7 +46,6 @@ public class ComandasController : ControllerBase
     {
         try
         {
-            // Primeiro tenta buscar como ID de comanda
             var comanda = await _comandaService.GetComandaByIdAsync(id);
             
             if (comanda != null)
@@ -55,7 +53,6 @@ public class ComandasController : ControllerBase
                 return Ok(comanda);
             }
 
-            // Se não encontrar, tenta buscar como ID de cliente (primeira comanda do cliente)
             var comandasCliente = await _comandaService.GetComandasByClienteIdAsync(id);
             if (comandasCliente.Any())
             {

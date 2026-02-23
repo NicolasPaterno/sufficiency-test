@@ -26,18 +26,16 @@ public class UsuariosController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        // Verificar se o login já existe
         var usuarioExistente = await _usuarioDAO.GetByLoginAsync(usuario.Login);
         if (usuarioExistente != null)
         {
             return Conflict(new { message = "Login já existe" });
         }
 
-        // Criptografar senha
         usuario.Senha = _authService.HashPassword(usuario.Senha);
 
         var usuarioCriado = await _usuarioDAO.CreateAsync(usuario);
-        usuarioCriado.Senha = string.Empty; // Não retornar senha
+        usuarioCriado.Senha = string.Empty;
 
         return CreatedAtAction(nameof(GetById), new { id = usuarioCriado.Id }, usuarioCriado);
     }
@@ -51,7 +49,7 @@ public class UsuariosController : ControllerBase
             return NotFound(new { message = "Usuário não encontrado" });
         }
 
-        usuario.Senha = string.Empty; // Não retornar senha
+        usuario.Senha = string.Empty;
         return Ok(usuario);
     }
 }

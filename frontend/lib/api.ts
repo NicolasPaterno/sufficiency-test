@@ -21,9 +21,6 @@ async function fetchWithAuth<T>(
 
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
-    console.log('Token sendo enviado:', token.substring(0, 20) + '...');
-  } else {
-    console.warn('Nenhum token encontrado para a requisição:', endpoint);
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -32,7 +29,6 @@ async function fetchWithAuth<T>(
   });
 
   if (!response.ok) {
-    // Se for 401, remover token e redirecionar para login
     if (response.status === 401) {
       auth.removeToken();
       if (typeof window !== 'undefined') {
@@ -46,7 +42,6 @@ async function fetchWithAuth<T>(
   return response.json();
 }
 
-// Auth endpoints
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -63,13 +58,7 @@ export const authApi = {
     }
 
     const data: LoginResponse = await response.json();
-    console.log('Resposta do login:', data);
-    if (data.access_token) {
-      auth.setToken(data.access_token);
-      console.log('Token salvo no localStorage');
-    } else {
-      console.error('Token não encontrado na resposta:', data);
-    }
+    auth.setToken(data.access_token);
     return data;
   },
 

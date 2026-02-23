@@ -50,7 +50,6 @@ public class ComandaService
 
     public async Task<ComandaDTO> CreateComandaAsync(CriarComandaRequest request)
     {
-        // Criar cliente automaticamente (ID será gerado pelo banco)
         var cliente = new Cliente
         {
             NomeCliente = request.NomeCliente,
@@ -58,17 +57,14 @@ public class ComandaService
         };
         await _clienteDAO.CreateAsync(cliente);
 
-        // Criar comanda
         var comanda = new Comanda
         {
             IdCliente = cliente.IdCliente,
             DataCriacao = DateTime.UtcNow
         };
 
-        // Adicionar produtos à comanda (criar produtos automaticamente)
         foreach (var produtoRequest in request.Produtos)
         {
-            // Criar produto automaticamente (ID será gerado pelo banco)
             var produto = new Produto
             {
                 Nome = produtoRequest.Nome,
@@ -95,16 +91,12 @@ public class ComandaService
         var comanda = await _comandaDAO.GetWithProdutosAsync(id);
         if (comanda == null) return null;
 
-        // Atualizar produtos se fornecidos
         if (request.Produtos != null && request.Produtos.Any())
         {
-            // Remover produtos antigos
             comanda.ComandaProdutos.Clear();
 
-            // Adicionar novos produtos (criar automaticamente)
             foreach (var produtoRequest in request.Produtos)
             {
-                // Criar produto automaticamente (ID será gerado pelo banco)
                 var produto = new Produto
                 {
                     Nome = produtoRequest.Nome,

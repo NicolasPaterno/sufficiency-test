@@ -20,19 +20,16 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configuração para garantir que tabelas sejam no plural
         modelBuilder.Entity<Usuario>().ToTable("Usuarios");
         modelBuilder.Entity<Cliente>().ToTable("Clientes");
         modelBuilder.Entity<Produto>().ToTable("Produtos");
         modelBuilder.Entity<Comanda>().ToTable("Comandas");
         modelBuilder.Entity<ComandaProduto>().ToTable("ComandaProdutos");
 
-        // Configuração de índices
         modelBuilder.Entity<Usuario>()
             .HasIndex(u => u.Login)
             .IsUnique();
 
-        // Configurar IDs como Identity (auto-increment)
         modelBuilder.Entity<Usuario>()
             .Property(u => u.Id)
             .ValueGeneratedOnAdd();
@@ -53,7 +50,6 @@ public class ApplicationDbContext : DbContext
             .Property(cp => cp.Id)
             .ValueGeneratedOnAdd();
 
-        // Configuração de relacionamentos
         modelBuilder.Entity<Comanda>()
             .HasOne(c => c.Cliente)
             .WithMany(cl => cl.Comandas)

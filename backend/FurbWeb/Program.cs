@@ -9,15 +9,12 @@ using FurbWeb.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
 builder.Services.AddControllers();
 
-// Configure Entity Framework with PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Configure JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key não configurada");
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "FurbWeb";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "FurbWeb";
@@ -41,7 +38,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -52,7 +48,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API REST para gerenciamento de comandas"
     });
 
-    // Configure JWT in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header usando o esquema Bearer. Exemplo: \"Authorization: Bearer {token}\"",
@@ -78,7 +73,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
@@ -90,19 +84,16 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register DAOs
 builder.Services.AddScoped<IUsuarioDAO, UsuarioDAO>();
 builder.Services.AddScoped<IClienteDAO, ClienteDAO>();
 builder.Services.AddScoped<IProdutoDAO, ProdutoDAO>();
 builder.Services.AddScoped<IComandaDAO, ComandaDAO>();
 
-// Register Services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ComandaService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
