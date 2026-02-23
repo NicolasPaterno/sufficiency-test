@@ -50,12 +50,27 @@ public class ComandaService
 
     public async Task<ComandaDTO> CreateComandaAsync(CriarComandaRequest request)
     {
-        var cliente = new Cliente
+        Cliente cliente;
+        if (request.IdCliente.HasValue)
         {
-            NomeCliente = request.NomeCliente,
-            TelefoneCliente = request.TelefoneCliente
-        };
-        await _clienteDAO.CreateAsync(cliente);
+            var existente = await _clienteDAO.GetByIdAsync(request.IdCliente.Value);
+            cliente = existente ?? new Cliente
+            {
+                NomeCliente = request.NomeCliente,
+                TelefoneCliente = request.TelefoneCliente
+            };
+            if (existente == null)
+                await _clienteDAO.CreateAsync(cliente);
+        }
+        else
+        {
+            cliente = new Cliente
+            {
+                NomeCliente = request.NomeCliente,
+                TelefoneCliente = request.TelefoneCliente
+            };
+            await _clienteDAO.CreateAsync(cliente);
+        }
 
         var comanda = new Comanda
         {
@@ -90,6 +105,14 @@ public class ComandaService
     {
         var comanda = await _comandaDAO.GetWithProdutosAsync(id);
         if (comanda == null) return null;
+
+        if (request.IdCliente.HasValue)
+        {
+            var cliente = await _clienteDAO.GetByIdAsync(request.IdCliente.Value);
+            if (cliente == null)
+                throw new ArgumentException("Cliente não encontrado.");
+            comanda.IdCliente = request.IdCliente.Value;
+        }
 
         if (request.Produtos != null && request.Produtos.Any())
         {

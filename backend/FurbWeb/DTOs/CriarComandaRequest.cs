@@ -2,12 +2,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FurbWeb.DTOs;
 
+/// <summary>Comanda obrigatoriamente possui um cliente (identificado por IdCliente ou por NomeCliente + TelefoneCliente).</summary>
 public class CriarComandaRequest
 {
-    [Required(ErrorMessage = "NomeCliente é obrigatório")]
+    public int? IdCliente { get; set; }
+
+    [Required(ErrorMessage = "Nome do cliente é obrigatório")]
     public string NomeCliente { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "TelefoneCliente é obrigatório")]
+    [Required(ErrorMessage = "Telefone do cliente é obrigatório")]
     public string TelefoneCliente { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Produtos são obrigatórios")]
