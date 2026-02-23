@@ -2,6 +2,7 @@ import { auth } from './auth';
 import type { 
   Cliente, 
   Comanda, 
+  CriarClienteRequest,
   CriarComandaRequest, 
   AtualizarComandaRequest,
   SuccessResponse 
@@ -101,6 +102,20 @@ export const authApi = {
     } finally {
       auth.removeToken();
     }
+  },
+};
+
+export const clientesApi = {
+  getAll: async (nome?: string): Promise<Cliente[]> => {
+    const query = nome != null && nome.trim() !== '' ? `?nome=${encodeURIComponent(nome.trim())}` : '';
+    return fetchWithAuth<Cliente[]>(`/clientes${query}`);
+  },
+
+  create: async (cliente: CriarClienteRequest): Promise<Cliente> => {
+    return fetchWithAuth<Cliente>('/clientes', {
+      method: 'POST',
+      body: JSON.stringify(cliente),
+    });
   },
 };
 

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/lib/api';
 import { auth } from '@/lib/auth';
-import { UtensilsCrossed, LayoutDashboard, PlusCircle, LogOut, Home } from 'lucide-react';
+import { UtensilsCrossed, LayoutDashboard, PlusCircle, LogOut, Home, Users } from 'lucide-react';
 
 export function Header() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export function Header() {
     try {
       await authApi.logout();
     } catch {
-      
+
     } finally {
       router.push('/');
     }
@@ -36,6 +36,12 @@ export function Header() {
                 <Button variant="ghost" size="sm" className="gap-1.5">
                   <Home className="h-4 w-4" />
                   Início
+                </Button>
+              </Link>
+              <Link href="/clientes">
+                <Button variant="ghost" size="sm" className="gap-1.5">
+                  <Users className="h-4 w-4" />
+                  Clientes
                 </Button>
               </Link>
               <Link href="/comandas">

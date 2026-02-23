@@ -23,13 +23,20 @@ export interface CriarProdutoRequest {
   preco: number;
 }
 
+export interface CriarClienteRequest {
+  nomeCliente: string;
+  telefoneCliente: string;
+}
+
 export interface CriarComandaRequest {
+  idCliente?: number;
   nomeCliente: string;
   telefoneCliente: string;
   produtos: CriarProdutoRequest[];
 }
 
 export interface AtualizarComandaRequest {
+  idCliente?: number;
   produtos: CriarProdutoRequest[];
 }
 

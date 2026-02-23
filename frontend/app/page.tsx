@@ -6,7 +6,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { auth } from '@/lib/auth';
-import { UtensilsCrossed, LayoutDashboard, PlusCircle, LogIn, UserPlus } from 'lucide-react';
+import { UtensilsCrossed, LayoutDashboard, PlusCircle, LogIn, UserPlus, Users } from 'lucide-react';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -42,7 +42,20 @@ export default function Home() {
         </section>
 
         {isAuth ? (
-          <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
+          <section className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 max-w-5xl mx-auto">
+            <Link href="/clientes">
+              <Card className="h-full transition-all hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 cursor-pointer">
+                <CardHeader>
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-2">
+                    <Users className="h-5 w-5" />
+                  </div>
+                  <CardTitle>Clientes</CardTitle>
+                  <CardDescription>
+                    Cadastrar e gerenciar clientes.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
             <Link href="/comandas">
               <Card className="h-full transition-all hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 cursor-pointer">
                 <CardHeader>
@@ -51,7 +64,7 @@ export default function Home() {
                   </div>
                   <CardTitle>Ver Comandas</CardTitle>
                   <CardDescription>
-                    Listar e acessar todas as comandas e clientes.
+                    Listar e acessar todas as comandas.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -76,7 +89,7 @@ export default function Home() {
                 </div>
                 <CardTitle>Você está conectado</CardTitle>
                 <CardDescription>
-                  Use o menu acima para navegar ou os cards ao lado.
+                  Use o menu acima ou os cards para navegar.
                 </CardDescription>
               </CardHeader>
             </Card>
