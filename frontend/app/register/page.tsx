@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Header } from '@/components/Header';
 import { authApi } from '@/lib/api';
+import { UserPlus } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -32,61 +34,71 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Cadastro</CardTitle>
-          <CardDescription>Crie sua conta para acessar o sistema</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="login">Login</Label>
-              <Input
-                id="login"
-                type="text"
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
-                required
-                minLength={3}
-                maxLength={50}
-                disabled={loading}
-                placeholder="Digite seu login"
-              />
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container max-w-md mx-auto px-4 py-12">
+        <Card className="border-2 shadow-xl">
+          <CardHeader className="text-center space-y-2">
+            <div className="mx-auto w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <UserPlus className="h-6 w-6 text-primary" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="senha">Senha</Label>
-              <Input
-                id="senha"
-                type="password"
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                required
-                minLength={6}
-                disabled={loading}
-                placeholder="Digite sua senha"
-              />
-            </div>
-            {error && (
-              <div className="text-sm text-red-500 bg-red-50 p-3 rounded">
-                {error}
+            <CardTitle className="text-2xl">Criar conta</CardTitle>
+            <CardDescription>Cadastre-se para usar o sistema de comandas</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="login">Login</Label>
+                <Input
+                  id="login"
+                  type="text"
+                  value={login}
+                  onChange={(e) => setLogin(e.target.value)}
+                  required
+                  minLength={3}
+                  maxLength={50}
+                  disabled={loading}
+                  placeholder="Escolha um login (mín. 3 caracteres)"
+                  className="h-11"
+                />
               </div>
-            )}
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Criando conta...' : 'Criar Conta'}
-            </Button>
-            <div className="text-center text-sm">
-              <span className="text-gray-600">Já tem uma conta? </span>
-              <Link href="/login" className="text-blue-600 hover:underline">
-                Fazer login
-              </Link>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label htmlFor="senha">Senha</Label>
+                <Input
+                  id="senha"
+                  type="password"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  required
+                  minLength={6}
+                  disabled={loading}
+                  placeholder="Senha (mín. 6 caracteres)"
+                  className="h-11"
+                />
+              </div>
+              {error && (
+                <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                  {error}
+                </div>
+              )}
+              <Button type="submit" className="w-full h-11" disabled={loading}>
+                {loading ? 'Criando conta...' : 'Criar conta'}
+              </Button>
+              <p className="text-center text-sm text-muted-foreground">
+                Já tem uma conta?{' '}
+                <Link href="/login" className="font-medium text-primary hover:underline">
+                  Fazer login
+                </Link>
+              </p>
+              <p className="text-center">
+                <Link href="/" className="text-sm text-muted-foreground hover:text-foreground">
+                  ← Voltar ao início
+                </Link>
+              </p>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
-
-
-

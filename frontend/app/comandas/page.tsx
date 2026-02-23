@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { comandasApi, authApi } from '@/lib/api';
+import { Header } from '@/components/Header';
+import { comandasApi } from '@/lib/api';
 import { auth } from '@/lib/auth';
 import type { Cliente } from '@/types/comanda';
+import { LayoutDashboard, PlusCircle } from 'lucide-react';
 
 export default function ComandasPage() {
   const router = useRouter();
@@ -21,7 +23,6 @@ export default function ComandasPage() {
       router.push('/login');
       return;
     }
-
     loadComandas();
   }, [router]);
 
@@ -37,73 +38,75 @@ export default function ComandasPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await authApi.logout();
-    } catch (err) {
-      console.error('Erro ao fazer logout:', err);
-    } finally {
-      router.push('/login');
-    }
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Carregando...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Comandas</h1>
-          <div className="flex gap-2">
-            <Link href="/comandas/nova">
-              <Button>Nova Comanda</Button>
-            </Link>
-            <Button variant="outline" onClick={handleLogout}>
-              Sair
-            </Button>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container max-w-6xl mx-auto px-4 py-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <LayoutDashboard className="h-7 w-7 text-primary" />
+              Comandas
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              Clientes com comandas cadastradas
+            </p>
           </div>
+          <Link href="/comandas/nova">
+            <Button className="w-full sm:w-auto gap-2">
+              <PlusCircle className="h-4 w-4" />
+              Nova Comanda
+            </Button>
+          </Link>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
+          <div className="mb-4 p-4 bg-destructive/10 text-destructive rounded-lg border border-destructive/20">
             {error}
           </div>
         )}
 
-        <Card>
+        <Card className="border-2 shadow-sm">
           <CardHeader>
-            <CardTitle>Lista de Clientes</CardTitle>
-            <CardDescription>Clientes com comandas cadastradas</CardDescription>
+            <CardTitle>Lista de clientes</CardTitle>
+            <CardDescription>Clique em Ver comanda para abrir os detalhes</CardDescription>
           </CardHeader>
           <CardContent>
             {clientes.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">Nenhuma comanda encontrada</p>
+              <div className="text-center py-12 text-muted-foreground">
+                <p className="mb-4">Nenhuma comanda encontrada.</p>
+                <Link href="/comandas/nova">
+                  <Button>Abrir primeira comanda</Button>
+                </Link>
+              </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID Cliente</TableHead>
+                    <TableHead>ID</TableHead>
                     <TableHead>Nome</TableHead>
                     <TableHead>Telefone</TableHead>
-                    <TableHead>Ações</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {clientes.map((cliente) => (
                     <TableRow key={cliente.idCliente}>
-                      <TableCell>{cliente.idCliente}</TableCell>
+                      <TableCell className="font-medium">{cliente.idCliente}</TableCell>
                       <TableCell>{cliente.nomeCliente}</TableCell>
                       <TableCell>{cliente.telefoneCliente}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-right">
                         <Link href={`/comandas/${cliente.idCliente}`}>
                           <Button variant="outline" size="sm">
-                            Ver Comandas
+                            Ver comanda
                           </Button>
                         </Link>
                       </TableCell>
@@ -114,7 +117,7 @@ export default function ComandasPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+      </main>
     </div>
   );
 }

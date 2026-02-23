@@ -1,47 +1,63 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Header } from '@/components/Header';
 import { comandasApi } from '@/lib/api';
 import { auth } from '@/lib/auth';
-import type { CriarComandaRequest, CriarProdutoRequest } from '@/types/comanda';
-import { PlusCircle } from 'lucide-react';
+import type { CriarProdutoRequest } from '@/types/comanda';
+import { Pencil } from 'lucide-react';
 
-export default function NovaComandaPage() {
+export default function EditarComandaPage() {
   const router = useRouter();
-  const [nomeCliente, setNomeCliente] = useState('');
-  const [telefoneCliente, setTelefoneCliente] = useState('');
+  const params = useParams();
+  const id = Number(params.id);
   const [produtos, setProdutos] = useState<CriarProdutoRequest[]>([]);
   const [produtoNome, setProdutoNome] = useState('');
   const [produtoPreco, setProdutoPreco] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadComanda, setLoadComanda] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!auth.isAuthenticated()) {
+      router.push('/login');
+      return;
+    }
+    if (!id) return;
+    const load = async () => {
+      try {
+        setLoadComanda(true);
+        const data = await comandasApi.getById(id);
+        setProdutos(
+          data.produtos.map((p) => ({ nome: p.nome, preco: p.preco }))
+        );
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro ao carregar comanda');
+      } finally {
+        setLoadComanda(false);
+      }
+    };
+    load();
+  }, [id, router]);
 
   const handleAddProduto = () => {
     if (!produtoNome || !produtoPreco) {
       setError('Preencha todos os campos do produto');
       return;
     }
-
     const preco = parseFloat(produtoPreco);
     if (isNaN(preco) || preco < 0) {
       setError('Preço inválido');
       return;
     }
-
-    const novoProduto: CriarProdutoRequest = {
-      nome: produtoNome,
-      preco: preco,
-    };
-
-    setProdutos([...produtos, novoProduto]);
+    setProdutos([...produtos, { nome: produtoNome, preco }]);
     setProdutoNome('');
     setProdutoPreco('');
     setError('');
@@ -54,40 +70,30 @@ export default function NovaComandaPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-
-    if (!nomeCliente || !telefoneCliente) {
-      setError('Preencha todos os campos do cliente');
-      return;
-    }
-
     if (produtos.length === 0) {
       setError('Adicione pelo menos um produto');
       return;
     }
-
     try {
       setLoading(true);
-      const request: CriarComandaRequest = {
-        nomeCliente,
-        telefoneCliente,
-        produtos,
-      };
-
-      await comandasApi.create(request);
-      router.push('/');
+      await comandasApi.update(id, { produtos });
+      router.push(`/comandas/${id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar comanda');
+      setError(err instanceof Error ? err.message : 'Erro ao atualizar comanda');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!auth.isAuthenticated()) {
-    router.push('/login');
-    return null;
+  if (loadComanda) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
+      </div>
+    );
   }
 
-  const total = produtos.reduce((sum, produto) => sum + produto.preco, 0);
+  const total = produtos.reduce((sum, p) => sum + p.preco, 0);
 
   return (
     <div className="min-h-screen bg-background">
@@ -95,10 +101,10 @@ export default function NovaComandaPage() {
       <main className="container max-w-4xl mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <PlusCircle className="h-7 w-7 text-primary" />
-            Nova comanda
+            <Pencil className="h-7 w-7 text-primary" />
+            Editar comanda
           </h1>
-          <Link href="/comandas">
+          <Link href={`/comandas/${id}`}>
             <Button variant="outline">Voltar</Button>
           </Link>
         </div>
@@ -112,37 +118,7 @@ export default function NovaComandaPage() {
         <form onSubmit={handleSubmit}>
           <Card className="mb-4 border-2 shadow-sm">
             <CardHeader>
-              <CardTitle>Cliente</CardTitle>
-              <CardDescription>Dados do cliente da comanda</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="nomeCliente">Nome do Cliente</Label>
-                <Input
-                  id="nomeCliente"
-                  value={nomeCliente}
-                  onChange={(e) => setNomeCliente(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="telefoneCliente">Telefone do Cliente</Label>
-                <Input
-                  id="telefoneCliente"
-                  value={telefoneCliente}
-                  onChange={(e) => setTelefoneCliente(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-4 border-2 shadow-sm">
-            <CardHeader>
               <CardTitle>Adicionar produto</CardTitle>
-              <CardDescription>Nome e preço de cada item</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -167,11 +143,7 @@ export default function NovaComandaPage() {
                   />
                 </div>
               </div>
-              <Button
-                type="button"
-                onClick={handleAddProduto}
-                disabled={loading}
-              >
+              <Button type="button" onClick={handleAddProduto} disabled={loading}>
                 Adicionar Produto
               </Button>
             </CardContent>
@@ -180,7 +152,7 @@ export default function NovaComandaPage() {
           {produtos.length > 0 && (
             <Card className="mb-4 border-2 shadow-sm">
               <CardHeader>
-                <CardTitle>Produtos na comanda</CardTitle>
+                <CardTitle>Produtos da comanda</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -192,11 +164,11 @@ export default function NovaComandaPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {produtos.map((produto, index) => (
+                    {produtos.map((p, index) => (
                       <TableRow key={index}>
-                        <TableCell>{produto.nome}</TableCell>
+                        <TableCell>{p.nome}</TableCell>
                         <TableCell className="text-right">
-                          R$ {produto.preco.toFixed(2)}
+                          R$ {p.preco.toFixed(2)}
                         </TableCell>
                         <TableCell>
                           <Button
@@ -216,7 +188,7 @@ export default function NovaComandaPage() {
                       <TableCell className="text-right font-bold">
                         R$ {total.toFixed(2)}
                       </TableCell>
-                      <TableCell></TableCell>
+                      <TableCell />
                     </TableRow>
                   </TableBody>
                 </Table>
@@ -224,14 +196,11 @@ export default function NovaComandaPage() {
             </Card>
           )}
 
-          <div className="flex gap-2">
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Criando...' : 'Criar comanda'}
-            </Button>
-          </div>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar alterações'}
+          </Button>
         </form>
       </main>
     </div>
   );
 }
-

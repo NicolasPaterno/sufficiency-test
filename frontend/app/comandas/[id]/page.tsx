@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Header } from '@/components/Header';
 import { comandasApi } from '@/lib/api';
 import { auth } from '@/lib/auth';
 import type { Comanda } from '@/types/comanda';
+import { Pencil, Trash2 } from 'lucide-react';
 
 export default function ComandaDetalhesPage() {
   const router = useRouter();
@@ -56,25 +58,26 @@ export default function ComandaDetalhesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Carregando...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
       </div>
     );
   }
 
   if (error && !comanda) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-4xl mx-auto">
-          <Card>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container max-w-4xl mx-auto px-4 py-8">
+          <Card className="border-2">
             <CardContent className="pt-6">
-              <p className="text-red-500">{error}</p>
+              <p className="text-destructive">{error}</p>
               <Link href="/comandas">
-                <Button className="mt-4">Voltar</Button>
+                <Button className="mt-4">Voltar às comandas</Button>
               </Link>
             </CardContent>
           </Card>
-        </div>
+        </main>
       </div>
     );
   }
@@ -86,24 +89,27 @@ export default function ComandaDetalhesPage() {
   const total = comanda.produtos.reduce((sum, produto) => sum + produto.preco, 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Detalhes da Comanda</h1>
-          <Link href="/comandas">
-            <Button variant="outline">Voltar</Button>
-          </Link>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="container max-w-4xl mx-auto px-4 py-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <h1 className="text-2xl font-bold">Detalhes da comanda</h1>
+          <div className="flex gap-2">
+            <Link href="/comandas">
+              <Button variant="outline">Voltar</Button>
+            </Link>
+          </div>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
+          <div className="mb-4 p-4 bg-destructive/10 text-destructive rounded-lg border border-destructive/20">
             {error}
           </div>
         )}
 
-        <Card className="mb-4">
+        <Card className="mb-4 border-2 shadow-sm">
           <CardHeader>
-            <CardTitle>Informações do Cliente</CardTitle>
+            <CardTitle>Cliente</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -114,14 +120,14 @@ export default function ComandaDetalhesPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4">
+        <Card className="mb-4 border-2 shadow-sm">
           <CardHeader>
             <CardTitle>Produtos</CardTitle>
             <CardDescription>Itens da comanda</CardDescription>
           </CardHeader>
           <CardContent>
             {comanda.produtos.length === 0 ? (
-              <p className="text-center text-gray-500 py-4">Nenhum produto na comanda</p>
+              <p className="text-center text-muted-foreground py-4">Nenhum produto na comanda</p>
             ) : (
               <Table>
                 <TableHeader>
@@ -153,12 +159,19 @@ export default function ComandaDetalhesPage() {
           </CardContent>
         </Card>
 
-        <div className="flex gap-2">
-          <Button variant="destructive" onClick={handleDelete}>
-            Excluir Comanda
+        <div className="flex flex-wrap gap-2">
+          <Link href={`/comandas/${id}/editar`}>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Pencil className="h-4 w-4" />
+              Editar
+            </Button>
+          </Link>
+          <Button variant="destructive" size="sm" onClick={handleDelete} className="gap-1.5">
+            <Trash2 className="h-4 w-4" />
+            Excluir comanda
           </Button>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
