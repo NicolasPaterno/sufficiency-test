@@ -10,7 +10,7 @@ import type {
 } from '@/types/comanda';
 import type { LoginRequest, LoginResponse, RegisterRequest } from '@/types/auth';
 
-const API_BASE_URL = 'http://localhost:8080/FurbWeb/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/FurbWeb/v1';
 
 async function fetchWithAuth<T>(
   endpoint: string,

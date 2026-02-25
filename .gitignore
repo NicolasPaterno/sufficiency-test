@@ -76,3 +76,6 @@ logs/
 *.temp
 .cache/
 
+# Docker
+docker-compose.override.yml
+
