@@ -18,6 +18,13 @@ export interface Comanda {
   produtos: Produto[];
 }
 
+export interface ComandaResumo {
+  id: number;
+  idCliente: number;
+  nomeCliente: string;
+  telefoneCliente: string;
+}
+
 export interface CriarProdutoRequest {
   nome: string;
   preco: number;

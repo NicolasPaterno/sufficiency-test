@@ -1,7 +1,8 @@
 import { auth } from './auth';
 import type { 
   Cliente, 
-  Comanda, 
+  Comanda,
+  ComandaResumo,
   CriarClienteRequest,
   CriarComandaRequest, 
   AtualizarComandaRequest,
@@ -120,8 +121,8 @@ export const clientesApi = {
 };
 
 export const comandasApi = {
-  getAll: async (): Promise<Cliente[]> => {
-    return fetchWithAuth<Cliente[]>('/comandas');
+  getAll: async (): Promise<ComandaResumo[]> => {
+    return fetchWithAuth<ComandaResumo[]>('/comandas');
   },
 
   getById: async (id: number): Promise<Comanda> => {

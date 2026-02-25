@@ -18,22 +18,27 @@ public class ComandasController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<ClienteDTO>>> GetAll()
+    public async Task<ActionResult<List<ComandaResumoDTO>>> GetAll()
     {
         try
         {
             var comandas = await _comandaService.GetAllComandasAsync();
-            var clientes = comandas
+            var itens = comandas
                 .GroupBy(c => c.IdCliente)
-                .Select(g => new ClienteDTO
+                .Select(g =>
                 {
-                    IdCliente = g.Key,
-                    NomeCliente = g.First().NomeCliente,
-                    TelefoneCliente = g.First().TelefoneCliente
+                    var first = g.First();
+                    return new ComandaResumoDTO
+                    {
+                        Id = first.Id,
+                        IdCliente = g.Key,
+                        NomeCliente = first.NomeCliente,
+                        TelefoneCliente = first.TelefoneCliente
+                    };
                 })
                 .ToList();
 
-            return Ok(clientes);
+            return Ok(itens);
         }
         catch (Exception ex)
         {
